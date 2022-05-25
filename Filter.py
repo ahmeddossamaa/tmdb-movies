@@ -20,33 +20,27 @@ class Filter:
         df = self.data[self.data['revenue_adj'] != 0]
         self.data['revenue_adj'].replace(0, np.mean(df['revenue_adj']), inplace=True)
 
+    # Columns
+    def setUpColumns(self):
+        columnsToBeDropped = {'id', 'imdb_id', 'original_title', 'homepage', 'keywords', 'overview', 'tagline', 'director'}
+        self.convertZerosToMeanValue()
+        self.data.drop(columnsToBeDropped, axis=1, inplace=True)
+
+    def removeDuplicatesAndNull(self):
+        # remove duplicates
+        self.data.drop_duplicates(inplace=True)
+        # remove null
+        self.data.dropna(inplace=True)
+
     def convertCategoricalToNumerical(self):
         label_encoder = preprocessing.LabelEncoder()
         for i in self.data:
             if self.data[i].dtype.name == "object":
                 self.data[i] = label_encoder.fit_transform(self.data[i])
 
-    # Removers
-    def removeNan(self):
-        self.data.dropna(inplace=True)
-
-    def removeDuplicates(self):
-        self.data.drop_duplicates(inplace=True)
-        self.removeNan()
-
-    # Columns
-    def setUpColumns(self):
-        columnsToBeDropped = {'id', 'imdb_id', 'original_title', 'homepage', 'keywords', 'overview', 'tagline','director'}
-        self.convertZerosToMeanValue()
-        self.data.drop(columnsToBeDropped, axis=1, inplace=True)
-
-    def formatDate(self):
-        self.data['release_date'] = pd.to_datetime(self.data['release_date'])
-
     # Getters
     def getFilteredFile(self):
         self.setUpColumns()
-        self.removeDuplicates()
+        self.removeDuplicatesAndNull()
         self.convertCategoricalToNumerical()
-        # self.formatDate()
         return self.data
