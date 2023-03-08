@@ -48,3 +48,4 @@ class Model:
         # print("intercept", intercept)
         print("prediction", prediction)
         print("score", score)
+        print("Error", np.square(np.subtract(y_test, prediction)).mean())
